@@ -58,17 +58,17 @@ public class UDPReceive : MonoBehaviour
                     Debug.Log("Hands data deserialized successfully.");
                     foreach (var hand in handsData)
                     {
-                        Debug.Log($"Hand {hand.hand_index}: Number of landmarks: {hand.landmarks.Count}");
+                        //Debug.Log($"Hand {hand.hand_index}: Number of landmarks: {hand.landmarks.Count}");
                     }
                 }
                 else
                 {
-                    Debug.LogWarning("Hands data deserialization returned null.");
+                    //Debug.LogWarning("Hands data deserialization returned null.");
                 }
 
                 if (printToConsole) 
                 { 
-                    Debug.Log("Hands data received and deserialized.");
+                    //Debug.Log("Hands data received and deserialized.");
                 }
             }
             catch (Exception err)

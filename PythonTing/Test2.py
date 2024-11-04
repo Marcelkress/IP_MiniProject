@@ -28,7 +28,7 @@ serverAddressPort = ("127.0.0.1", 5052)
 cap = cv2.VideoCapture(0)
 
 while True:
-    # STEP 4: Capture a frame from the webcam.
+    # STEP 4: Capture a frame from the webcam.q
     ret, frame = cap.read()
     if not ret:
         break   

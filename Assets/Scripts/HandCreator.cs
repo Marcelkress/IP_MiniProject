@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class HandCreator : MonoBehaviour
@@ -14,6 +15,7 @@ public class HandCreator : MonoBehaviour
     public List<Transform> leftHand;
     public List<Transform> rightHand;
     public float lerpValue;
+    public Color lineColor;
 
     void Update()
     {
@@ -27,6 +29,7 @@ public class HandCreator : MonoBehaviour
         else if(called == true)
         {
             UpdateHands();
+            //DrawConnections();
         }
     }
 
@@ -96,5 +99,39 @@ public class HandCreator : MonoBehaviour
             }
         }
     }
+    private void DrawConnections()
+    {
+        List<HandData> handsData = UDP.ReceiveHandsData();
 
+        foreach(HandData hand in handsData)
+        {
+            for(int i = 0; i <= 5; i++)
+            {
+                Vector3 beginPos = new Vector3(hand.landmarks[i].x, hand.landmarks[i].y, hand.landmarks[i].z);
+                Vector3 endPos = new Vector3(hand.landmarks[i+1].x, hand.landmarks[i+1].y, hand.landmarks[i+1].z);
+
+                DrawLine(beginPos, endPos, lineColor, 1f);
+            }   
+        }
+    }
+    void DrawLine(Vector3 begin, Vector3 end, Color color, float duration)
+    {
+        GameObject myLine = new GameObject();
+
+        myLine.transform.position = begin;
+
+        LineRenderer lr = myLine.AddComponent<LineRenderer>();
+        lr.material = new Material(Shader.Find("Sprites/Default"));
+        lr.startColor = color;
+        lr.endColor = color;
+        lr.startWidth = 0.1f;
+        lr.endWidth = 0.1f;
+
+        lr.gameObject.transform.SetParent(parentTransform);
+
+        lr.SetPosition(0, begin);
+        lr.SetPosition(1, end);
+
+        Destroy(myLine, duration);
+    }
 }
