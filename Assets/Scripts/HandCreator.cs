@@ -1,10 +1,7 @@
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Xml.Serialization;
-using Unity.VisualScripting;
 using UnityEngine;
-    
-public class HandIdentify : MonoBehaviour
+
+public class HandCreator : MonoBehaviour
 {
     public UDPReceive UDP;
     public GameObject landMarkObject;
@@ -13,9 +10,10 @@ public class HandIdentify : MonoBehaviour
     public float waitTime;
     private float timePassed;
     bool called;
-
+    public Vector3 thresholdVector;
     public List<Transform> leftHand;
     public List<Transform> rightHand;
+    public float lerpValue;
 
     void Update()
     {
@@ -63,6 +61,7 @@ public class HandIdentify : MonoBehaviour
     void UpdateHands()
     {
         List<HandData> handsData = UDP.ReceiveHandsData();
+
         if (handsData == null || handsData.Count == 0)
         {
             return;
@@ -70,15 +69,29 @@ public class HandIdentify : MonoBehaviour
 
         foreach (HandData hand in handsData)
         {
-            List<Transform> handTransforms = hand.hand_index == 0 ? rightHand : leftHand;
+            List<Transform> handTransforms;
+
+            if (hand.hand_index == 1)
+            {   
+                handTransforms = rightHand;
+            }
+            else
+            {
+                handTransforms = leftHand;
+            }
 
             for (int i = 0; i < hand.landmarks.Count; i++)
             {
                 HandLandmark landmark = hand.landmarks[i];
-                if (handTransforms != null && handTransforms[i] != null)
+
+                Vector3 newPos = new Vector3(landmark.x * -1, landmark.y * -1, 0);
+
+                if((newPos - handTransforms[i].transform.position).magnitude >= thresholdVector.magnitude)
                 {
+                    Transform tf = handTransforms[i];
+
                     // Update the local position relative to the parent transform
-                    handTransforms[i].localPosition = new Vector3(landmark.x * -1, landmark.y * -1, landmark.z) * scaleFactor;
+                    tf.localPosition = Vector3.Lerp(tf.position, newPos * scaleFactor, lerpValue);
                 }
             }
         }

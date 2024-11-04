@@ -5,8 +5,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Collections.Generic;
-using Unity.Collections;
-using UnityEngine.UIElements;
 
 public class UDPReceive : MonoBehaviour
 {
@@ -17,7 +15,6 @@ public class UDPReceive : MonoBehaviour
     public bool printToConsole = false;
     public string data;
     public List<HandData> handsData; // List to store the hands data
-
 
     public void Awake()
     {
