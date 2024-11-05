@@ -71,9 +71,9 @@ public class UDPReceive : MonoBehaviour
                     //Debug.Log("Hands data received and deserialized.");
                 }
             }
-            catch (Exception err)
+            catch (Exception)
             {
-                print(err.ToString());
+                //print(err.ToString());
             }
         }
     }
