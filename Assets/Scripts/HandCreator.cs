@@ -17,6 +17,8 @@ public class HandCreator : MonoBehaviour
     public float lerpValue;
     public Color lineColor;
 
+    private LineRenderer lineRenderer;
+
     void Update()
     {
         timePassed += Time.deltaTime;
@@ -29,8 +31,20 @@ public class HandCreator : MonoBehaviour
         else if(called == true)
         {
             UpdateHands();
-            //DrawConnections();
+            DrawConnectionsLine();
         }
+    }
+
+    void Start()
+    {
+        // Add a LineRenderer component to the GameObject
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.startColor = lineColor;
+        lineRenderer.endColor = lineColor;
+        lineRenderer.startWidth = 0.05f;
+        lineRenderer.endWidth = 0.05f;
+        lineRenderer.positionCount = 0;
     }
 
     void CreateHands()
@@ -95,6 +109,9 @@ public class HandCreator : MonoBehaviour
 
                     // Update the local position relative to the parent transform
                     tf.localPosition = Vector3.Lerp(tf.position, newPos * scaleFactor, lerpValue);
+
+                    // Draw lines
+                    //Debug.DrawLine(newPos, handTransforms[i + 1].transform.position, lineColor, 0.1f);
                 }
             }
         }
@@ -107,8 +124,8 @@ public class HandCreator : MonoBehaviour
         {
             for(int i = 0; i == 5; i++)
             {
-                Vector3 beginPos = new Vector3(hand.landmarks[i].x, hand.landmarks[i].y, hand.landmarks[i].z) * scaleFactor;
-                Vector3 endPos = new Vector3(hand.landmarks[i+1].x, hand.landmarks[i+1].y, hand.landmarks[i+1].z) * scaleFactor;
+                Vector3 beginPos = new Vector3(hand.landmarks[i].x, hand.landmarks[i].y, 0) * scaleFactor;
+                Vector3 endPos = new Vector3(hand.landmarks[i+1].x, hand.landmarks[i+1].y, 0) * scaleFactor;
 
                 DrawLine(beginPos, endPos, .1f);
             }   
@@ -117,5 +134,28 @@ public class HandCreator : MonoBehaviour
     private void DrawLine(Vector3 beginPosition, Vector3 endPosition, float duration)
     {
         Debug.DrawLine(beginPosition, endPosition, lineColor, duration);
+    }
+
+    private void DrawConnectionsLine()
+    {
+        List<HandData> handsData = UDP.ReceiveHandsData();
+
+        foreach (HandData hand in handsData)
+        {
+            List<Transform> handTransforms = hand.hand_index == 1 ? rightHand : leftHand;
+
+            // Set the number of positions in the LineRenderer
+            lineRenderer.positionCount = handTransforms.Count;
+
+            for (int i = 0; i < handTransforms.Count - 1; i++)
+            {
+                Vector3 beginPos = handTransforms[i].localPosition;
+                Vector3 endPos = handTransforms[i + 1].localPosition;
+
+                // Set the positions in the LineRenderer
+                lineRenderer.SetPosition(i, beginPos);
+                lineRenderer.SetPosition(i + 1, endPos);
+            }
+        }
     }
 }
